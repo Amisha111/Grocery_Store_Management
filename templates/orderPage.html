@@ -1,0 +1,123 @@
+{% extends 'userNavBar.html' %}
+{% block title %} Home {% endblock %}
+{% block head %}
+<script src="https://kit.fontawesome.com/bc0f862ec5.js" crossorigin="anonymous"></script>
+<style>
+    .category-banner {
+        background-color: #f2f2f2;
+        padding: 10px;
+        margin-top: 20px;
+        font-size: 24px;
+    }
+
+    .text-custom-right {
+        text-align: right;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+{% block content %}
+{% set user_name = session['user'] %}
+{% set role = session['role'] %}
+{% if role == 'USER' %}
+
+<div class="layout-content" style="margin-top:20px;">
+    <div class="container flex-grow-1 container-p-y">
+        <h2>Orders </h2>
+        {% if  orderlist|length != 0 %}
+    
+        <div class="row">
+            <div class="col-md-3">
+                <h2>Order Number</h2>
+            </div>
+            <div class="col-md-3">
+                <h2>Date</h2>
+            </div>
+            <div class="col-md-3">
+                <h2>Total</h2>
+            </div>
+        </div>
+
+        {% for ord_num,order_values in orderlist.items() %}
+        <a data-bs-toggle="modal" data-bs-target="#showOrderModal{{ord_num}}">
+            <div class="row" style="margin-top: 20px; margin-bottom: 20px;background-color: #ecf1f4;">
+                <div class="col-md-3">
+                    <h3>{{ ord_num }}</h3>
+                </div>
+                <div class="col-md-3">
+                    <h3>{{ order_values[0].date }}</h3>
+                </div>
+                <div class="col-md-3">
+                    <h3>{{ order_values[0].total_amount }}</h3>
+                </div>
+            </div>
+        </a>
+        <div class="modal fade" id="showOrderModal{{ ord_num }}">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="custom-card" style="max-width: 300px;">
+                        <div class="card mb-6">
+                            <div class="card-header">
+                                <span><strong>Order Summary-{{ord_num}}</strong></span>
+                            </div>
+                            <div class="card-body">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <td>
+                                                <b>Product</b>
+                                            </td>
+                                            <td>
+                                                <b>Quantity</b>
+                                            </td>
+                                            <td>
+                                                <b>Price</b>
+                                            </td>
+                                            <td>
+                                                <b>Amount</b>
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for value in order_values %}
+                                        <tr>
+                                            <td>
+                                                {{value.product_name }}
+                                            </td>
+                                            <td>
+                                                {{value.quantity}}/{{value.units}}
+                                            </td>
+                                            <td>
+                                                {{value.unit_price}}
+                                            </td>
+                                            <td>
+                                                {{value.total_product_amount}}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="card-footer">
+                                <h4>Total paid:</h4>{{ order_values[0].total_amount }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="card mb-4" style="position: fixed;top: 50%;left: 50%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
+          <img src="/static/images/emptyOrder.png" class="d-block ui-w-40 rounded-circle">
+          <p style="text-align: center;">No orders!!!!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% else %}
+<p>Not Authorized to view this Page!!!</p>
+{% endif %}
+{% endblock %}
+{% endblock %}

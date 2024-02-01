@@ -1,0 +1,78 @@
+{% extends 'userNavBar.html' %}
+{% block title %} Home {% endblock %}
+{% block head %}
+<script src="https://kit.fontawesome.com/bc0f862ec5.js" crossorigin="anonymous"></script>
+<style>
+    .category-banner {
+        background-color: #f2f2f2;
+        padding: 10px;
+        margin-top: 20px;
+        font-size: 24px;
+    }
+        .text-custom-right {
+            text-align: right;
+        }
+</style>
+{% endblock %}
+
+{% block body %}
+{% block content %}
+{% set user_name = session['user'] %}
+{% set role = session['role'] %}
+{% if role == 'USER' %}
+
+<div class="layout-content" style="margin-top:20px;">
+  <div class="container flex-grow-1 container-p-y">
+<h2>Shopping Cart</h2>
+
+{% if cart|length != 0 %}
+
+<div class="row">
+    <div class="col-md-3"><h2>Product</h2></div>
+    <div class="col-md-3"><h2>Price</h2></div>
+        <div class="col-md-3"><h2>Quantity</h2></div>
+            <div class="col-md-3"><h2>Total</h2></div>
+</div>
+    {% for product in cart %}
+    <div class="row" style="margin-top: 20px; margin-bottom: 20px;background-color: #ecf1f4;display: flex; align-items: center; justify-content: center;">
+            <div class="col-md-3">
+                <img src="{{url_for('renderImage', product=product.product_name)}}" onerror="this.src='/static/default.png';" alt="{{ product.product_name }}" width="50" height="50">
+                <h3>{{ product.product_name}}</h3></div>
+            <div class="col-md-3"><h3>{{product.unit_price}}/{{product.units}}</h3></div>
+            <div class="col-md-3"><h3>{{product.quantity}}</h3></div>
+            <div class="col-md-3"><h3>{{product.totalamount}}</h3></div>
+        </div>
+    {% endfor %}
+    <div class = "row">
+        <div class="col-md-10 text-custom-right"><h4>Sub Total:{{total}}</h4></div>
+    </div>
+    <div class = "row">
+        <div class="col-md-5 text-custom-right"><a class="nav-link" href="/order"><button class="btn btn-primary">Buy</button></a>
+        </div>
+    </div>
+    {% else %}
+    <div class="card mb-4" style="position: fixed;top: 50%;left: 50%;-webkit-transform: translate(-50%, -50%);transform: translate(-50%, -50%);">
+      <img src="/static/images/emptyCart.jpeg" class="d-block ui-w-40 rounded-circle">
+      <p style="text-align: center;">Empty Cart!!!!</p>
+    </div>
+    {% endif %}
+
+</div>
+
+  </div>
+
+<script>
+
+    function inc(maxUnits, id) {
+
+    }
+    
+
+</script>
+</div>
+{% else %}
+<p>Not Authorized to view this Page!!!</p>
+{% endif %}
+{% endblock %}
+{% endblock %}
+

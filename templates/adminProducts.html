@@ -1,0 +1,309 @@
+{% extends 'adminNavBar.html' %}
+{% block title %}Categories{% endblock %}
+{% block head %}
+<script src="https://kit.fontawesome.com/bc0f862ec5.js" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block body %}
+{% block content %}
+{% set user_name = session['user'] %}
+{% set role = session['role'] %}
+{% if role == 'ADMIN' %}
+
+<p>welcome {{user_name}}</p>
+<div class="layout-content" style="margin-top:20px;">
+ <div class="container flex-grow-1 container-p-y">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td>
+                        <a data-bs-toggle="modal" data-bs-target="#addModal"> <button class="btn btn-info">Add New Product</button></a>
+                    </td>
+                    <div class="modal fade" id="addModal">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <form method="Post" action="/addNewProduct" enctype="multipart/form-data" onsubmit="return validateaddProduct();">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title"><b>Add New Product</b></h4>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="mb-3">
+                                            <label for="title" class="col-form-label"><b>Category</b></label>
+                                            <select id="category" name="category" class="form-control" required>
+                                                {% for category in categories %}
+                                                <option value="{{ category.category_name }}">{{ category.category_name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="product_name" class="col-form-label">Product Name</label>
+                                            <input type="text" id="product_name" id ="product_name" name="product_name"
+                                                class="form-control" required>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="units" class="col-form-label">Units</label>
+                                            <select id="units" name="units" class="form-control" required>
+                                                <option value="Kg">Kgs</option>
+                                                <option value="Litre">Litre</option>
+                                                <option value="Piece">Piece</option>
+                                            </select>
+                                        </div>
+
+
+                                        <div class="mb-3">
+
+
+                                            <label for="stock" class="col-form-label">Stock </label>
+                                            <input type="number" id="stock" name="stock" class="form-control" required>
+                                        </div>
+                                        <div class="mb-3"> 
+
+                                            <label for="max_units" class="col-form-label">Max Units </label>
+                                            <input type="number" id="max_units" name="max_units" class="form-control"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+
+                                            <label for="unit_price" class="col-form-label">Unit Price</label>
+                                            <input type="number" id="unit_price" name="unit_price" class="form-control"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+
+                                            <label for="description" class="col-form-label">Description</label>
+                                            <input type="text" id="description" name="description" class="form-control"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+
+                                            <label for="expiry_date" class="col-form-label">Expiry Date</label>
+                                            <input type="date" id="expiry_date" name="expiry_date" class="form-control"
+                                                required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="image" class="col-form-label">Image</label>
+                                            <input type="file" id="image" name="image" accept="image"
+                                                class="form-control" required>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" name="submit" class="btn btn-dark">Add Product</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </tr>
+            </tbody>
+        </table>
+
+        {% if products|length == 0 %}
+        <div class="card mb-2" style="position: fixed;top: 50%;left: 50%;">
+            <div class="card-body" style="position: fixed;">
+                <i class="fa-solid fa-camera fa-10x"></i>
+                <p>Add Some Products</p>
+            </div>
+
+        </div>
+        {% endif %}
+
+        <div class="row">
+            {% for product in products %}
+
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <span><strong>{{product.product_name}}  {%if product.stock == 0 %}
+                        <b style ="float: right;color: red;">OUT OF STOCK</b>
+                        {%else%}
+                       <b style="float: right;"> Stock:{{product.stock}}</b>
+                        {% endif%}</strong></span>
+                   
+                </div>
+                <div class="card-body">
+                    <div class="product-box">
+                        <img src="{{url_for('renderImage', product = product.product_name )}}"
+                            onerror="this.src='/static/default.png';" alt={{product.product_name}} width="75"
+                            height="75" class="rounded-circle me-2">
+                        <span>Rs.{{product.unit_price}}/{{product.units}}</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group">
+                        <a class="nav-link link-dark" data-bs-toggle="modal" data-bs-target="#editModal{{product.id}}">
+                            <button class="btn btn-warning">Edit</button></a>
+                        <form method="post" action="/deleteProduct"
+                            onsubmit="return confirm('Are you sure you want to delete this product?');">
+                            <input type="hidden" value="{{product.id}}" name="id" id="id" />
+                            <button type="submit" name="submit" class="btn btn-danger"><i class="fa-solid fa-trash"></i>
+                                Delete</button>
+                        </form>
+                        <div class="modal fade" id="editModal{{product.id}}">
+                            <div class="modal-dialog modal-xl">
+                                <div class="modal-content">
+                                    <form method="post" action="/editProduct" enctype="multipart/form-data" onsubmit="return validateEditProduct();">
+                                        <div class="modal-header">
+                                          <h4 class="modal-title"><b>Edit Product</b></h4>
+                                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                          <input type="hidden" value="{{product.id}}" name="id" id="id" />
+                                          <div class="mb-3">
+                                            <label for="edit_category" class="col-form-label"><b>Category</b></label>
+                                            <select id="category" name="edit_category" value="{{product.category}}"class="form-control" required>
+                                                {% for category in categories %}
+                                                <option value="{{ category.category_name }}">{{ category.category_name}}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="edit_product_name" class="col-form-label"><b>Product Name</b></label>
+                                            <input type="text" class="form-control" id="edit_product_name" name="edit_product_name" value="{{product.product_name}}" required>
+                                          </div>
+                                          <div class="mb-3">
+                                            <label for="edit_units" class="col-form-label"><b>Units</b></label>
+                                            <select id="edit_units" name="edit_units" value="{{product.units}}"class="form-control" required>
+                                                <option value="Kg">Kgs</option>
+                                                <option value="Litre">Litre</option>
+                                                <option value="Piece">Piece</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="edit_stock" class="col-form-label"><b>Stock</b></label>
+                                            <input type="text" class="form-control" id ="edit_stock" name="edit_stock" value="{{product.stock}}" required>
+                                          </div>
+                                          <div class="mb-3">
+                                            <label for="edit_max_units" class="col-form-label"><b>Max Units</b></label>
+                                            <input type="text" class="form-control" id="edit_max_units" name="edit_max_units" value="{{product.maxUnits}}" required>
+                                          </div>
+                                          <div class="mb-3">
+                                            <label for="edit_unit_price" class="col-form-label"><b>Unit Price</b></label>
+                                            <input type="text" class="form-control" id="edit_unit_price" name="edit_unit_price" value="{{product.unit_price}}" required>
+                                          </div>
+                                          <div class="mb-3">
+                                            <label for="edit_description" class="col-form-label"><b>Description</b></label>
+                                            <input type="text" class="form-control" id="edit_description" name="edit_description" value="{{product.description}}" required>
+                                          </div>
+                                          <div class="mb-3">
+                                            <label for="edit_expiry_date" class="col-form-label"><b>Expiry Date</b></label>
+                                            <input type="date" class="form-control" id ="edit_expiry_date" name="edit_expiry_date" value="{{product.expiryDate}}">
+                                          </div>
+                                       
+                                          <div class="mb-3">
+                                            <label for="edit_image" class="col-form-label"><b>Image</b></label>
+                                            <input type="file" class="form-control" name="edit_image" accept="image" value="{{product.image}}">
+                                          </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                          <button type="submit" name="submit" class="btn btn-dark" data-bs-dismiss="modal">Save</button>
+                                        </div>
+                                      </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <style>
+                    .custom-card {
+                        max-width: 300px;
+                        /* Adjust the maximum width as needed */
+                       /* margin: 0 auto; */
+                        /* Center the card horizontally */
+                    }
+                </style>
+            </div>
+        </div>
+
+
+        {% endfor %}
+        </div>
+    
+    </div>
+    <script>
+
+        function validateaddProduct() {
+          var description = document.getElementById('description').value;
+          var product_name = document.getElementById('product_name').value;
+          var stock = document.getElementById('stock').value;
+          var max_units = document.getElementById('max_units').value;
+          var unit_price = document.getElementById('unit_price').value;
+          var expiry_date = new Date(document.getElementById('expiry_date').value);
+          var currentDate = new Date();
+
+
+          if (stock <= 0) {
+            alert("Enter valid stock");
+            return false;
+          }
+          if (max_units <= 0) {
+            alert("Enter valid max_units");
+            return false;
+          }
+          if (unit_price <= 0) {
+            alert("Enter valid unit price");
+            return false;
+          }
+          
+          if (expiry_date <= currentDate) {
+            alert("Please enter future date");
+            return false;
+          }
+          
+          if (product_name.length < 5 || product_name.length > 20) {
+            alert("product_name must be at least 5 characters or at max 20 chars.");
+            return false;
+          }
+          if (description.length < 20 || category.length > 200) {
+            alert("Description must be at least 20 characters or at max 200 chars.");
+            return false;
+          }
+          return true;
+        }
+
+        function validateEditProduct() {
+            var description = document.getElementById('edit_description').value;
+            var product_name = document.getElementById('edit_product_name').value;
+            var stock = document.getElementById('edit_stock').value;
+            var max_units = document.getElementById('edit_max_units').value;
+            var unit_price = document.getElementById('edit_unit_price').value;
+            var expiry_date = new Date(document.getElementById('edit_expiry_date').value);
+            var currentDate = new Date();
+  
+  
+            if (stock <= 0) {
+              alert("Enter valid stock");
+              return false;
+            }
+            if (max_units <= 0) {
+              alert("Enter valid max_units");
+              return false;
+            }
+            if (unit_price <= 0) {
+              alert("Enter valid unit price");
+              return false;
+            }
+            
+            if (expiry_date <= currentDate) {
+              alert("Please enter future date");
+              return false;
+            }
+            
+            if (product_name.length < 5 || product_name.length > 20) {
+              alert("product_name must be at least 5 characters or at max 20 chars.");
+              return false;
+            }
+            if (description.length < 20 || category.length > 200) {
+              alert("Description must be at least 20 characters or at max 200 chars.");
+              return false;
+            }
+            return true;
+          }
+    </script>      
+</div>
+{% else %}
+
+{% endif %}
+{% endblock %}
+{% endblock %}

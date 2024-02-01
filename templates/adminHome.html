@@ -1,0 +1,27 @@
+{% extends 'adminNavBar.html' %}
+{% block title %} Home {% endblock %}
+{% block head %}
+<script src="https://kit.fontawesome.com/bc0f862ec5.js" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block body %}
+{% block content %}
+{% set user_name = session['user'] %}
+{% set role = session['role'] %}
+{% if role == 'ADMIN' %}
+
+<div class="layout-content" style="margin-top:20px;">
+  <div class="container flex-grow-1 container-p-y">
+    <p>welcome admin</p>
+    {{user_name}}
+    <br>
+    {{role}}
+  </div>
+</div>
+{% else %}
+
+{% endif %}
+
+{% endblock %}
+{% endblock %}
+

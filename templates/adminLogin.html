@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Login</title>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='bootstrap/css/bootstrap.min.css') }}" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+  <script type="text/javascript" src="{{ url_for('static', filename='js/custom_validations.js') }}"></script>
+  <script src="/static/js/main.js"></script>
+  <script src="https://kit.fontawesome.com/bc0f862ec5.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="" id="content">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <ul class=flashes>
+          {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible" role="alert">
+            {{ message }} </div>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+  
+      </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-4"></div>
+      <div class="d-flex justify-content-center col-sm-8">
+        <div class="container pt-3">
+          <h1>&emsp;&emsp;</h1>
+          <div class="jumbotron jumbotron-fluid">
+            <section class="background-radial-gradient overflow-hidden">
+              <div class="col-lg-6 mb-5 mb-lg-0 position-relative">
+                <div class="card bg-glass">
+                  <div class="card-body px-20 py-5 px-md-5">
+                    <h2 class="d-flex justify-content-center">Grocery Store</h2>
+                    <form method="post" action="/adminLogin">
+                      <div class="form-outline mb-4">
+                        <div class="row"><b><label class="form-label" for="username">User Name </label></b></div>
+                        <div class="row"><input type="text" id="username" name="username" class="form-control" required /></div>
+                      </div>
+                      <div class="form-outline mb-4">
+                        <div class="row"><b><label class="form-label" for="password">Password</label></b></div>
+                        <div class="row"><input type="password" id="password" name="password" class="form-control password" required /></div>
+                      </div>
+                      <button type="submit" class="btn btn-primary btn-block mb-4">
+                        <b>Login</b>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2"></div>
+    </div>
+  </div>
+</body>
+</html>
